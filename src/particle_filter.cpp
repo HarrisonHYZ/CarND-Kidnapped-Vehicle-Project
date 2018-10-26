@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <iterator>
+#include <chrono>
 
 #include "particle_filter.h"
 
@@ -25,9 +26,11 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 	
-	cout<<"Init Starts!"<<endl;//Added by Harrison
+	// cout<<"Init Starts!"<<endl;//Added by Harrison
 
-	default_random_engine gen;
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  	std::default_random_engine gen(seed);
+
 	double std_x, std_y, std_theta, gps_x, gps_y; // Standard deviations for x, y, and theta
 
 	// TODO: Set standard deviations for x, y, and theta
@@ -45,7 +48,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	normal_distribution<double> dist_theta(theta, std_theta);
 
 	// Create 10 particle
-	num_particles = 10;
+	num_particles = 30;
 	
 	for (int i = 0; i < num_particles; ++i) {
 		double sample_x, sample_y, sample_theta;
@@ -69,12 +72,12 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		 particles.push_back(particle);
 		 
 		 // Print your samples to the terminal.
-		 cout << "Particle " << i << " " << sample_x << " " << sample_y << " " << sample_theta << " " << 1.0 << endl;
+		 //cout << "Particle " << i << " " << sample_x << " " << sample_y << " " << sample_theta << " " << 1.0 << endl;
 	}
 
 	is_initialized = true;
 
-	cout<<"Init end!"<<endl;//Added by Harrison
+	// cout<<"Init end!"<<endl;//Added by Harrison
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
@@ -83,9 +86,10 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
-	cout<<"Prediction Starts!"<<endl;//Added by Harrison
+	// cout<<"Prediction Starts!"<<endl;//Added by Harrison
 
-	default_random_engine gen;
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  	std::default_random_engine gen(seed);
 
 	// This line creates a normal (Gaussian) distribution for x, y, theta
 	// normal_distribution<double> dist_x(0, std_pos[0]);
@@ -113,10 +117,10 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		 	particles[i].theta = dist_theta(gen);
 
 			//angle normalization
-    		while (particles[i].theta> M_PI) particles[i].theta-=2.*M_PI;
-    		while (particles[i].theta<-M_PI) particles[i].theta+=2.*M_PI;
+    		// while (particles[i].theta> M_PI) particles[i].theta-=2.*M_PI;
+    		// while (particles[i].theta<-M_PI) particles[i].theta+=2.*M_PI;
 
-    		//cout<<"Particle "<<i<<" is "<<particles[i].x<<", "<<particles[i].y<<", "<<particles[i].theta<<endl;//Added by Harrison
+    		// cout<<"Particle "<<i<<" is "<<particles[i].x<<", "<<particles[i].y<<", "<<particles[i].theta<<endl;//Added by Harrison
 		}
 	}
 	else{
@@ -130,6 +134,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			particles[i].y = particles[i].y + (velocity / yaw_rate) * (cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
 			particles[i].theta = particles[i].theta + yaw_rate * delta_t;
 
+			cout<<"yaw_rate is: "<<yaw_rate<<endl;//Added by Harrison
+			cout<<"particle theta before noise is: "<<particles[i].theta<<endl;//Added by Harrison
+
 			// This line creates a normal (Gaussian) distribution for x, y, theta
 			normal_distribution<double> dist_x(particles[i].x, std_pos[0]);
 			normal_distribution<double> dist_y(particles[i].y, std_pos[1]);
@@ -139,15 +146,17 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		 	particles[i].y = dist_y(gen);
 		 	particles[i].theta = dist_theta(gen);
 
-			//angle normalization
-    		while (particles[i].theta> M_PI) particles[i].theta-=2.*M_PI;
-    		while (particles[i].theta<-M_PI) particles[i].theta+=2.*M_PI;
+		 	cout<<"particle theta after noise is: "<<particles[i].theta<<endl;//Added by Harrison
 
-    		//cout<<"Particle "<<i<<" is "<<particles[i].x<<", "<<particles[i].y<<", "<<particles[i].theta<<endl;//Added by Harrison
+			//angle normalization
+    		// while (particles[i].theta> M_PI) particles[i].theta-=2.*M_PI;
+    		// while (particles[i].theta<-M_PI) particles[i].theta+=2.*M_PI;
+
+    		// cout<<"Particle "<<i<<" is "<<particles[i].x<<", "<<particles[i].y<<", "<<particles[i].theta<<endl;//Added by Harrison
 		}
 	}
 
-	cout<<"Prediction End!"<<endl;//Added by Harrison
+	// cout<<"Prediction End!"<<endl;//Added by Harrison
 }
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
@@ -156,7 +165,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
 
-	cout<<"dataAssociation Starts!"<<endl;//Added by Harrison
+	// cout<<"dataAssociation Starts!"<<endl;//Added by Harrison
 
 	for(int i=0; i<observations.size(); i++){
 		observations[i].id = predicted[0].id;
@@ -178,7 +187,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	// }
 	// Added by Harrison
 
-	cout<<"dataAssociation End!"<<endl;//Added by Harrison
+	// cout<<"dataAssociation End!"<<endl;//Added by Harrison
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -201,11 +210,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	// Added by Harrison
 	
 
-	cout<<"updateWeights Starts!"<<endl;//Added by Harrison
+	// cout<<"updateWeights Starts!"<<endl;//Added by Harrison
 
 	for(int m=0; m<num_particles; m++){
 
-		cout<<"This is particle "<<m<<endl;//Added by Harrison
+		// cout<<"This is particle "<<m<<endl;//Added by Harrison
 
 		//	 Predict all the map landmarks within the sensor_range for a particular particle
 		std::vector<LandmarkObs> predicted;
@@ -309,7 +318,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			}
 		// }
 
-		//cout<<"The weight of particle " << m <<" before normalization is: "<<particles[m].weight<<endl;//Added by Harrison
+		// cout<<"The weight of particle " << m <<" before normalization is: "<<particles[m].weight<<endl;//Added by Harrison
 		//cout<<"TEST!!!"<<endl;//Added by Harrison
 	}
 
@@ -320,20 +329,68 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		sum_weight += particles[m].weight;
 	}
 
+	// cout<<"weight sum is: "<<sum_weight<<endl;//Added by Harrison
+
 	for(int m=0; m<num_particles; m++){
 		particles[m].weight /= sum_weight;
 
-		cout<<"The weight of particle " << m <<" after normalization is: "<<particles[m].weight<<endl;//Added by Harrison
+		//cout<<"The weight of particle " <<m<<" after normalization is: "<<particles[m].weight<<endl;//Added by Harrison
 	}
 
-	cout<<"updateWeights Ends!"<<endl;//Added by Harrison
+	// cout<<"updateWeights Ends!"<<endl;//Added by Harrison
 }
 
 void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
+	
+	// Get the max weight in all particles and store all particle weights in member weights
+	double max_weight =  particles[0].weight;
 
+	for (int i = 1; i < num_particles; ++i) {
+		if (particles[i].weight > max_weight) {
+				max_weight = particles[i].weight;
+		}
+	}
+
+	// cout<<"Max weight is "<<max_weight<<endl;//Added by Harrison
+
+	// Create a list with the same weight to generate a uniform distribution between 0 and num_particles
+	std::vector<double> uni_weights;
+	for (int i = 0; i < num_particles; ++i) {
+		uni_weights.push_back(1.0);
+	}
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  	std::default_random_engine gen(seed);
+
+	std::discrete_distribution<int> uni_dist_num(uni_weights.begin(), uni_weights.end());
+	std::uniform_real_distribution<double> uni_dist(0.0,1.0);
+
+
+	int index = uni_dist_num(gen);
+	//cout<<"random index is: "<<index<<endl;//Added by harrison
+	double beta = 0.0;
+
+	std::vector<Particle> resample_particles;
+
+	for(int m=0; m<num_particles; ++m){
+		double random_num = uni_dist(gen);
+		//cout<<"random number is: "<<random_num<<endl;//Added by Harrison
+
+		beta += random_num * 2.0 * max_weight;
+		while(beta > particles[index].weight){
+			beta -= particles[index].weight;
+			index = (index + 1)%num_particles;
+		}
+		resample_particles.push_back(particles[index]);
+		// cout<<"resample particles is: "<<m<<", "<<resample_particles[m].x<<", "<<resample_particles[m].y<<", "<<resample_particles[m].theta<<endl;//Added by Harrison
+	}
+
+	for(int n=0; n<num_particles; ++n){
+		particles[n] = resample_particles[n];
+	}
 }
 
 Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 
