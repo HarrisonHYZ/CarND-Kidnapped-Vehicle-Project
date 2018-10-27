@@ -134,8 +134,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			particles[i].y = particles[i].y + (velocity / yaw_rate) * (cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
 			particles[i].theta = particles[i].theta + yaw_rate * delta_t;
 
-			cout<<"yaw_rate is: "<<yaw_rate<<endl;//Added by Harrison
-			cout<<"particle theta before noise is: "<<particles[i].theta<<endl;//Added by Harrison
+			// cout<<"yaw_rate is: "<<yaw_rate<<endl;//Added by Harrison
+			// cout<<"particle theta before noise is: "<<particles[i].theta<<endl;//Added by Harrison
 
 			// This line creates a normal (Gaussian) distribution for x, y, theta
 			normal_distribution<double> dist_x(particles[i].x, std_pos[0]);
@@ -146,7 +146,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		 	particles[i].y = dist_y(gen);
 		 	particles[i].theta = dist_theta(gen);
 
-		 	cout<<"particle theta after noise is: "<<particles[i].theta<<endl;//Added by Harrison
+		 	// cout<<"particle theta after noise is: "<<particles[i].theta<<endl;//Added by Harrison
 
 			//angle normalization
     		// while (particles[i].theta> M_PI) particles[i].theta-=2.*M_PI;
